@@ -1,0 +1,31 @@
+{
+  "name": "miniruler",
+  "version": "0.0.0",
+  "description": "Manage roles in contexts",
+  "main": "index.js",
+  "scripts": {
+    "test": "node ./node_modules/mocha/bin/mocha"
+  },
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:jacoborus/miniruler.git"
+  },
+  "keywords": [
+    "roles",
+    "permissions"
+  ],
+  "author": "Jacobo Tabernero <jacobo@xarope.eu>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jacoborus/miniruler/issues"
+  },
+  "homepage": "https://github.com/jacoborus/miniruler",
+  "dependencies": {
+    "deep-extend": "^0.2.11"
+  },
+  "devDependencies": {
+    "chai": "^1.9.1",
+    "mocha": "^1.21.4"
+  }
+}
