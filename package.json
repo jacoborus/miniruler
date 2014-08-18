@@ -21,9 +21,6 @@
     "url": "https://github.com/jacoborus/miniruler/issues"
   },
   "homepage": "https://github.com/jacoborus/miniruler",
-  "dependencies": {
-    "deep-extend": "^0.2.11"
-  },
   "devDependencies": {
     "chai": "^1.9.1",
     "mocha": "^1.21.4"
