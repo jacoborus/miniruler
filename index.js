@@ -36,6 +36,11 @@ var setActions = function (actions) {
  * @param {Object} ctx [description]
  */
 var Context = function (ctx, parent) {
+	if (parent) {
+		this.parent = parent;
+	} else {
+		this.key = 'main';
+	}
 	var i;
 	this.contexts = {};
 	this.roles = {};
@@ -167,13 +172,19 @@ Context.prototype.removeActions = function (actions) {
 /**
  * Add a child context
  * @param {String} name keyname for context
- * @param {Object} obj  context properties
+ * @param {Object} ctx  context properties
  */
-Context.prototype.addContext = function (name, props) {
+Context.prototype.addContext = function (name, ctx) {
 	if (this.contexts[name]) {
 		throw Error;
 	}
-	this.contexts[name] = new Context( props, this );
+	if (typeof name !== 'string') {
+		throw new Error( 'context.addContext method requires a String name' );
+	}
+	if (typeof ctx !== 'undefined' && typeof ctx !== 'object') {
+		throw new Error( 'context.addContext method requires a Object ctx' );
+	}
+	this.contexts[name] = new Context( ctx, this );
 };
 
 Context.prototype.removeContext = function (name) {

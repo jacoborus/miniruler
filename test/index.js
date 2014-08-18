@@ -196,3 +196,23 @@ describe( 'removeActions', function () {
 	});
 });
 
+describe( 'addContext', function () {
+
+	it( 'requires a string keyname for the context', function () {
+		expect( function () {
+			ruler.addContext( 23 );
+		}).to.throw( 'context.addContext method requires a String name' );
+	});
+
+	it( 'requires context to be a object', function () {
+		expect( function () {
+			ruler.addContext( 'subcontext', 2 );
+		}).to.throw( 'context.addContext method requires a Object ctx' );
+	});
+
+	it( 'link parent context to subcontext', function () {
+		ruler.addContext( 'subcontext', {} );
+		expect( ruler.contexts.subcontext.parent.key ).to.equal( 'main' );
+	});
+});
+

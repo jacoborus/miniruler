@@ -30,6 +30,16 @@ ruler.addActions({
 		level: 0
 	}
 });
+
+ruler.addContext('wiki');
+
+var wikiCtx = ruler.contexts.wiki;
+
+wikiCtx.addRoles({
+	// ...
+});
+
+// ...
 ```
 
 API
