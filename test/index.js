@@ -152,6 +152,14 @@ describe( 'setAction', function () {
 	});
 });
 
+var rules = {
+	level: 2,
+	roles: ['editor', 'member'],
+	parentLevel: 4,
+	parentRoles: ['owner'],
+	mainLevel: 10,
+	mainRoles: ['superadmin']
+};
 
 describe( 'setActions', function () {
 
@@ -162,14 +170,6 @@ describe( 'setActions', function () {
 	});
 
 	it( 'launch setAction for every action', function () {
-		var rules = {
-			level: 2,
-			roles: ['editor', 'member'],
-			parentLevel: 4,
-			parentRoles: ['owner'],
-			mainLevel: 10,
-			mainRoles: ['superadmin']
-		};
 		ruler.setActions({
 			'cinco': rules,
 			'seis': rules
@@ -178,3 +178,21 @@ describe( 'setActions', function () {
 		expect( ruler.actions.seis.level ).to.equal(2);
 	});
 });
+
+describe( 'removeActions', function () {
+
+	it( 'remove a single action from context', function () {
+		ruler.setAction( 'seven', rules );
+		ruler.removeActions( 'seven' );
+		expect( ruler.actions.seven ).to.not.exist;
+	});
+
+	it( 'remove a multiple actions from context', function () {
+		ruler.setAction( 'ocho', rules );
+		ruler.setAction( 'nueve', rules );
+		ruler.removeActions(['ocho', 'nueve']);
+		expect( ruler.actions.ocho ).to.not.exist;
+		expect( ruler.actions.nueve ).to.not.exist;
+	});
+});
+

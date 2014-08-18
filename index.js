@@ -41,20 +41,6 @@ var setActions = function (actions) {
 	}
 };
 
-/*!
- * Remove actions from context or resource
- * @param  {[type]} actions [description]
- * @return {[type]}         [description]
- */
-var removeActions = function (actions) {
-	var i;
-	if (typeof actions === 'string') {
-		actions = [actions];
-	}
-	for (i in actions) {
-		delete this.actions[actions[i]];
-	}
-};
 
 /**
  * Context constructor
@@ -175,15 +161,30 @@ Context.prototype.setActions = function (actions) {
 	setActions.call( this, actions );
 };
 
+/*!
+ * Remove actions from context or resource
+ * @param  {String|Array} actions list of action names to remove
+ */
 Context.prototype.removeActions = function (actions) {
-	removeActions.call( this, actions );
+	var i;
+	if (typeof actions === 'string') {
+		actions = [actions];
+	}
+	for (i in actions) {
+		delete this.actions[actions[i]];
+	}
 };
 
-Context.prototype.addContext = function (name, obj) {
+/**
+ * Add a child context
+ * @param {String} name keyname for context
+ * @param {Object} obj  context properties
+ */
+Context.prototype.addContext = function (name, props) {
 	if (this.contexts[name]) {
 		throw Error;
 	}
-	this.contexts[name] = new Context( obj, this );
+	this.contexts[name] = new Context( props, this );
 };
 
 Context.prototype.removeContext = function (name) {
