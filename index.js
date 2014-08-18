@@ -17,25 +17,14 @@ var setRoles = function (roles) {
 };
 
 /*!
- * Remove roles form context or resource
- * @param  {Array|String} roles role name or list of role names
- */
-var removeRoles = function (roles) {
-	var i;
-	if (typeof roles === 'string') {
-		roles = [roles];
-	}
-	for (i in roles) {
-		delete this.roles[roles[i]];
-	}
-};
-
-/*!
  * Add or overwrite actions in context or resource
  * @param {Object} actions actions and its rules
  */
 var setActions = function (actions) {
 	var i;
+	if (typeof actions !== 'object') {
+		throw new Error( 'Action rules must be a object' );
+	}
 	for (i in actions) {
 		this.actions[i] = actions[i];
 	}
@@ -94,11 +83,14 @@ Context.prototype.setRoles = function (roles) {
  * @param  {String|Array} roles list of roles to delete
  */
 Context.prototype.removeRoles = function (roles) {
+	var i;
 	roles = roles || [];
 	if (typeof roles === 'string') {
 		roles = [roles];
 	}
-	removeRoles.call( this, roles );
+	for (i in roles) {
+		delete this.roles[roles[i]];
+	}
 };
 
 /**
@@ -155,9 +147,6 @@ Context.prototype.setAction = function (name, rules) {
  * @param {Object} actions action rules
  */
 Context.prototype.setActions = function (actions) {
-	if (typeof actions !== 'object') {
-		throw new Error( 'Action rules must be a object' );
-	}
 	setActions.call( this, actions );
 };
 
