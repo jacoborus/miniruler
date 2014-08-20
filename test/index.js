@@ -216,3 +216,12 @@ describe( 'addContext', function () {
 	});
 });
 
+describe( 'removeContext', function () {
+
+	it( 'remove child context from context', function () {
+		ruler.addContext( 'childCtx' );
+		ruler.removeContext( 'childCtx' );
+		expect( ruler.contexts.childCtx ).to.not.exist;
+	});
+});
+

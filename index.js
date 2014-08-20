@@ -131,6 +131,7 @@ Context.prototype.setAction = function (name, rules) {
 			this.actions[name][nums[i]] = this.actions[name][nums[i]] || [];
 		}
 	}
+
 	for (i in arrs) {
 		if (typeof rules[arrs[i]] !== 'undefined') {
 			if (typeof rules[arrs[i]] !== 'object') {
@@ -169,6 +170,7 @@ Context.prototype.removeActions = function (actions) {
 	}
 };
 
+
 /**
  * Add a child context
  * @param {String} name keyname for context
@@ -188,7 +190,7 @@ Context.prototype.addContext = function (name, ctx) {
 };
 
 Context.prototype.removeContext = function (name) {
-	delete this.resources[name];
+	delete this.contexts[name];
 };
 
 ruler = new Context();
