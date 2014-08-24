@@ -211,18 +211,29 @@ Context.prototype.addContext = function (name, ctx) {
 	this.contexts[name] = new Context( ctx, this );
 };
 
+/**
+ * remove context from parent context
+ * @param  {String} name name of the context
+ */
 Context.prototype.removeContext = function (name) {
 	delete this.contexts[name];
 };
 
-Context.prototype.can = function (pass, action) {
 
-	if (typeof pass === 'string') {
-		 return checkRole.call( this, pass, action );
-	} else if (typeof pass === 'number') {
-		return checkLevel.call( this, pass, action );
+/**
+ * Check if user can do an action in context
+ * @param  {String|Number} user   user role or user level
+ * @param  {String} action action to perform
+ * @return {Boolean}        permission
+ */
+Context.prototype.can = function (user, action) {
+
+	if (typeof user === 'string') {
+		 return checkRole.call( this, user, action );
+	} else if (typeof user === 'number') {
+		return checkLevel.call( this, user, action );
 	} else {
-		throw new Error( 'pass must be a number or string' );
+		throw new Error( 'user must be a number or string' );
 	}
 };
 
