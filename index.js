@@ -1,7 +1,5 @@
 'use strict';
 
-var ruler;
-
 /*!
  * Add or overwrite roles in context or resource
  * @param {[type]} roles [description]
@@ -30,6 +28,30 @@ var setActions = function (actions) {
 	}
 };
 
+var checkLevel = function (level, action) {
+	if (level >= this.actions[action].level) {
+		return true;
+	}
+	return false;
+};
+
+var checkRole = function (role, action) {
+	var roles = this.actions[action].roles,
+		a, l;
+
+	for (a in roles) {
+		if (roles[a] === role) {
+			return true;
+		}
+	}
+	if (this.roles[role]) {
+		l = checkLevel.call( this, this.roles[role], action );
+		if (l) {
+			return true;
+		}
+	}
+	return false;
+};
 
 /**
  * Context constructor
@@ -193,6 +215,15 @@ Context.prototype.removeContext = function (name) {
 	delete this.contexts[name];
 };
 
-ruler = new Context();
+Context.prototype.can = function (pass, action) {
 
-module.exports = ruler;
+	if (typeof pass === 'string') {
+		 return checkRole.call( this, pass, action );
+	} else if (typeof pass === 'number') {
+		return checkLevel.call( this, pass, action );
+	} else {
+		throw new Error( 'pass must be a number or string' );
+	}
+};
+
+module.exports = Context;

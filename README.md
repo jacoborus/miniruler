@@ -12,14 +12,14 @@ Example
 ```js
 var ruler = require( 'miniruler' );
 
-ruler.addRoles({
+ruler.setRoles({
 	'admin': 5, // role name and level
 	'author': 4,
 	'user': 3,
 	'member': 1
 });
 
-ruler.addActions({
+ruler.setActions({
 	manageSettings: {
 		roles: ['admin']
 	},
@@ -53,6 +53,7 @@ API
 - removeActions
 - addContext
 - removeContext
+- can
 
 
 <br><br>

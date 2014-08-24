@@ -1,7 +1,9 @@
 'use strict';
 
 var expect = require('chai').expect,
-	ruler = require('..');
+	Ruler = require('..');
+
+var ruler = new Ruler();
 
 describe( 'miniruler', function () {
 
@@ -225,3 +227,52 @@ describe( 'removeContext', function () {
 	});
 });
 
+
+var r2 = new Ruler();
+
+r2.setRoles({
+    'super': 6, // role name and level
+    'admin': 5, // role name and level
+    'author': 4,
+    'user': 3,
+    'member': 1
+});
+
+r2.setActions({
+    manageSettings: {
+        roles: ['admin']
+    },
+    post: {
+        roles: ['author', 'user'],
+    },
+    sendEmails: {
+    	level: 4
+    },
+    readEmails: {
+    	level: 6
+    },
+    comment: {
+        level: 0
+    }
+});
+
+
+describe( 'can', function () {
+
+	it( 'return permission for role', function () {
+		expect( r2.can( 'admin', 'manageSettings' )).to.equal( true );
+		expect( r2.can( 'author', 'manageSettings' )).to.equal( false );
+		expect( r2.can( 'admin', 'post' )).to.equal( false );
+		expect( r2.can( 'other', 'post' )).to.equal( false );
+	});
+
+	it( 'return permission for direct level', function () {
+		expect( r2.can( 1, 'sendEmails' )).to.equal( false );
+		expect( r2.can( 4, 'sendEmails' )).to.equal( true );
+	});
+
+	it( 'return permission for level througth role level', function () {
+		expect( r2.can( 'super', 'readEmails' )).to.equal( true );
+		expect( r2.can( 'user', 'sendEmails' )).to.equal( false );
+	});
+});
