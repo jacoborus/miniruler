@@ -30,16 +30,16 @@ ruler.can( 'author', 'manageSettings' );  // => false
 
 /* - work with levels - */
 
-ruler.setRoles({
+ruler.setLevels({
     'admin': 5, // role name and level
     'author': 4,
     'user': 3,
     'member': 1
 });
 
-ruler.setAction( 'comment', {
+ruler.setActions({ comment: {
     level: 2
-});
+}});
 
 ruler.can( 1, 'comment' );  // => false
 ruler.can( 'user', 'comment' );  // => true
@@ -49,9 +49,7 @@ ruler.can( 'user', 'comment' );  // => true
 
 ruler.addContext('wiki');
 
-var wikiCtx = ruler.contexts.wiki;
-
-wikiCtx.addRoles({
+ruler.wiki.setLevels({
     // ...
 });
 
@@ -61,12 +59,13 @@ wikiCtx.addRoles({
 API
 ---
 
-- setRole
-- setRoles
-- removeRoles
-- setAction
+Context:
 - setActions
 - removeActions
+- setLevels
+- removeLevels
+- allow
+- revoke
 - addContext
 - removeContext
 - can
