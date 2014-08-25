@@ -8,8 +8,8 @@ var ruler = new Ruler();
 describe( 'miniruler', function () {
 
 	it( 'has correct structure', function () {
-		expect( ruler._roles ).to.exist;
-		expect( ruler._roles ).to.be.a('object');
+		expect( ruler._levels ).to.exist;
+		expect( ruler._levels ).to.be.a('object');
 		expect( ruler._actions ).to.exist;
 		expect( ruler._actions ).to.be.a('object');
 		expect( ruler.contexts ).to.exist;
@@ -19,14 +19,17 @@ describe( 'miniruler', function () {
 
 describe( 'setLevels', function () {
 
-	it( 'requires a object as param', function () {
-		expect( function () {
-			ruler.setLevels( );
-		}).to.throw( 'setLevels requires a object as param' );
+	it( 'launch callback automatically when no levels', function () {
+		ruler.setLevels( null, function () {
+			expect();
+		});
+	});
 
-		expect( function () {
-			ruler.setLevels( 2 );
-		}).to.throw( 'setLevels requires a object as param' );
+	it( 'callback error when bad type', function () {
+		ruler.setLevels( 2, function (err) {
+			console.log(err);
+			expect( err ).to.exist;
+		});
 	});
 
 	it( 'set roles from object', function () {
@@ -36,7 +39,7 @@ describe( 'setLevels', function () {
 			member: 1
 		};
 		ruler.setLevels( roles );
-		expect( ruler._roles.admin ).to.equal(5);
+		expect( ruler._levels.admin ).to.equal(5);
 	});
 });
 
@@ -46,15 +49,15 @@ describe( 'removeLevels', function () {
 	it( 'remove a single role', function () {
 		ruler.setLevels({ testsinglerole: 3 });
 		ruler.removeLevels( 'testsinglerole' );
-		expect( ruler._roles.testsinglerole ).to.not.exist;
+		expect( ruler._levels.testsinglerole ).to.not.exist;
 	});
 
 	it( 'remove multiple roles', function () {
 		ruler.setLevels({ multirol1: 3 });
 		ruler.setLevels({ multirol2: 3 });
 		ruler.removeLevels([ 'multirol1', 'multirol2' ]);
-		expect( ruler._roles.multirol1 ).to.not.exist;
-		expect( ruler._roles.multirol2 ).to.not.exist;
+		expect( ruler._levels.multirol1 ).to.not.exist;
+		expect( ruler._levels.multirol2 ).to.not.exist;
 	});
 });
 
@@ -71,9 +74,9 @@ var rules = {
 describe( 'setActions', function () {
 
 	it( 'requires a object with rules', function () {
-		expect( function () {
-			ruler.setActions( 1 );
-		}).to.throw( 'ruler Context.setActions requires an action object' );
+		ruler.setActions( 1, function (err) {
+			expect( err ).to.exist;
+		});
 	});
 
 	it( 'add rules to a new action', function () {

@@ -1,7 +1,7 @@
 miniRuler
 =========
 
-Manage roles in contexts.
+Manage roles in contexts asynchronously.
 
 **In early development**
 

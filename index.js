@@ -2,35 +2,40 @@
 
 var Action;
 
+var isArray = function (obj) {
+	return Object.prototype.toString.call( obj ) === '[object Array]';
+};
+
 /*!
  * Add or overwrite roles in context or resource
  * @param {[type]} roles [description]
  */
-var setLevels = function (roles) {
+var setLevels = function (roles, cb) {
 	var i;
 	for (i in roles) {
 		if (!roles[i] && roles[i] !== 0) {
 			roles[i] = 1;
 		}
-		this._roles[i] = roles[i];
+		this._levels[i] = roles[i];
 	}
+	cb();
 };
 
 /*!
  * Add or overwrite actions in context or resource
  * @param {Object} actions actions and its rules
  */
-var setActions = function (actions) {
+var setActions = function (actions, callback) {
+	var cb = callback || function () {};
 	if (typeof actions !== 'object') {
-		throw new Error( 'ruler Context.setActions requires an action object' );
+		return cb( new Error( 'ruler Context.setActions requires an action object' ));
 	}
 	var i;
 	for (i in actions) {
-		if (!this._actions[i]) {
-			this._actions[i] = new Action();
-		}
+		this._actions[i] = this._actions[i] || new Action();
 		this._actions[i].set( actions[i] );
 	}
+	cb();
 };
 
 var checkLevel = function (level, action) {
@@ -52,8 +57,8 @@ var checkRole = function (role, action) {
 		}
 	}
 
-	if (this._roles[role]) {
-		l = checkLevel.call( this, this._roles[role], action );
+	if (this._levels[role]) {
+		l = checkLevel.call( this, this._levels[role], action );
 		if (l) {
 			return true;
 		}
@@ -90,7 +95,7 @@ Action.prototype.hasRole = function (role, ctx) {
 	return false;
 };
 
-Action.prototype.allow = function (roles) {
+Action.prototype.allow = function (roles, cb) {
 	var i;
 	if (typeof roles === 'string') {
 		roles = [roles];
@@ -100,9 +105,10 @@ Action.prototype.allow = function (roles) {
 			this.roles.push( roles[i] );
 		}
 	}
+	cb();
 };
 
-Action.prototype.revoke = function (roles) {
+Action.prototype.revoke = function (roles, cb) {
 	var i, r;
 	if (typeof roles === 'string') {
 		roles = [roles];
@@ -113,6 +119,7 @@ Action.prototype.revoke = function (roles) {
 		    this.roles.splice( r, 1 );
 		}
 	}
+	cb();
 };
 
 Action.prototype.set = function (rules) {
@@ -126,48 +133,58 @@ Action.prototype.set = function (rules) {
  * Context constructor
  * @param {Object} ctx [description]
  */
-var Context = function (ctx, parent) {
+var Context = function (ctx, parent, cb) {
+	cb = cb || function () {};
 	if (parent) {
 		this.parent = parent;
 	} else {
 		this.key = 'main';
 	}
-	var i;
+	var self = this;
 	this.contexts = {};
-	this._roles = {};
+	this._levels = {};
 	this._actions = {};
 	ctx = ctx || {};
-	setLevels.call( this, ctx.roles  || {});
-	setActions.call( this, ctx._actions  || {});
-	for (i in ctx.contexts || {}) {
-		this[i]  = new Context( ctx.contexts[i] );
-	}
+	setLevels.call( this, ctx._levels  || {}, function () {
+		setActions.call( this, ctx._actions  || {}, function () {
+			var i;
+			for (i in ctx.contexts || {}) {
+				self[i]  = new Context( ctx.contexts[i], self, cb );
+			}
+		});
+	});
 };
 
 /**
- * Add or update roles to a context
- * @param {Object} roles Roles names and its levels
+ * Add or update levels to a context
+ * @param {Object} levels Roles names and its levels
  */
-Context.prototype.setLevels = function (roles) {
-	if (!roles || typeof roles !== 'object') {
-		throw new Error( 'setLevels requires a object as param' );
+Context.prototype.setLevels = function (levels, callback) {
+	var cb = callback || function () {};
+	if (typeof levels !== 'object') {
+		return cb( new Error( 'setLevels requires a object as param' ));
 	}
-	setLevels.call( this, roles );
+	setLevels.call( this, levels, cb );
 };
 
 /**
  * Remove one or multiple roles from context
- * @param  {String|Array} roles list of roles to delete
+ * @param  {String|Array} roles role or list of roles to delete
  */
-Context.prototype.removeLevels = function (roles) {
-	var i;
+Context.prototype.removeLevels = function (roles, callback) {
+	var cb = callback || function () {},
+		i;
 	roles = roles || [];
+	if (!roles || (typeof roles !== 'string' && !isArray( roles ))) {
+		return cb( 'Context.removeLevels requires a string or array' );
+	}
 	if (typeof roles === 'string') {
 		roles = [roles];
 	}
 	for (i in roles) {
-		delete this._roles[roles[i]];
+		delete this._levels[roles[i]];
 	}
+	cb();
 };
 
 
@@ -175,16 +192,23 @@ Context.prototype.removeLevels = function (roles) {
  * Add or update actions in context
  * @param {Object} actions action rules
  */
-Context.prototype.setActions = function (actions) {
-	setActions.call( this, actions );
+Context.prototype.setActions = function (actions, callback) {
+	setActions.call( this, actions, callback );
 };
 
 /*!
  * Remove actions from context or resource
  * @param  {String|Array} actions list of action names to remove
  */
-Context.prototype.removeActions = function (actions) {
-	var i;
+Context.prototype.removeActions = function (actions, callback) {
+	var cb = callback || function () {},
+		i;
+	if (!actions) {
+		return cb();
+	}
+	if (typeof actions !== 'string' && !isArray( actions )) {
+		return cb( 'Context.removeLevels requires a string or array' );
+	}
 	if (typeof actions === 'string') {
 		actions = [actions];
 	}
@@ -193,20 +217,34 @@ Context.prototype.removeActions = function (actions) {
 			delete this._actions[actions[i]];
 		}
 	}
+	cb();
 };
 
-
-Context.prototype.allow = function (role, action) {
+/**
+ * Grant permission to a user over an action
+ * @param  {String|Number} role   role or level
+ * @param  {String} action action keyname
+ */
+Context.prototype.allow = function (roles, action, callback) {
+	var cb = callback || function () {};
+	if (!roles) {
+		return cb();
+	}
 	if (!this._actions[action]) {
 		this._actions[action] = new Action();
 	}
-	this._actions[action].allow( role );
+	this._actions[action].allow( roles, cb );
 };
 
-Context.prototype.revoke = function (role, action) {
-	if (this._actions[action]) {
-		this._actions[action].revoke( role );
+Context.prototype.revoke = function (roles, action, callback) {
+	var cb = callback || function () {};
+	if (!roles) {
+		return cb();
 	}
+	if (this._actions[action]) {
+		return this._actions[action].revoke( roles, cb );
+	}
+	cb();
 };
 
 
@@ -215,7 +253,7 @@ Context.prototype.revoke = function (role, action) {
  * @param {String} name keyname for context
  * @param {Object} ctx  context properties
  */
-Context.prototype.addContext = function (name, ctx) {
+Context.prototype.addContext = function (name, ctx, callback) {
 	if (this.contexts[name]) {
 		throw Error;
 	}
@@ -225,15 +263,19 @@ Context.prototype.addContext = function (name, ctx) {
 	if (typeof ctx !== 'undefined' && typeof ctx !== 'object') {
 		throw new Error( 'context.addContext method requires a Object ctx' );
 	}
-	this.contexts[name] = new Context( ctx, this );
+	this.contexts[name] = new Context( ctx, this, callback );
 };
 
 /**
  * remove context from parent context
  * @param  {String} name name of the context
  */
-Context.prototype.removeContext = function (name) {
-	delete this.contexts[name];
+Context.prototype.removeContext = function (name, callback) {
+	var cb = callback || function () {};
+	if (this.contexts[name]) {
+		delete this.contexts[name];
+	}
+	cb();
 };
 
 
