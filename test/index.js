@@ -1,9 +1,14 @@
 'use strict';
+var expect;
 
-var expect = require('chai').expect,
-	Ruler = require('..');
+if (typeof chai === 'undefined') {
+	expect = require('chai').expect;
+	var miniruler = require('..');
+} else {
+	 expect = chai.expect;
+}
 
-var ruler = new Ruler();
+var ruler = new miniruler();
 
 describe( 'miniruler', function () {
 
@@ -27,7 +32,6 @@ describe( 'setLevels', function () {
 
 	it( 'callback error when bad type', function () {
 		ruler.setLevels( 2, function (err) {
-			console.log(err);
 			expect( err ).to.exist;
 		});
 	});
@@ -154,7 +158,7 @@ describe( 'removeContext', function () {
 });
 
 
-var r2 = new Ruler();
+var r2 = new miniruler();
 
 r2.setLevels({
     'super': 6, // role name and level
@@ -204,7 +208,7 @@ describe( 'can', function () {
 });
 
 
-var r3 = new Ruler();
+var r3 = new miniruler();
 
 describe( 'allow', function () {
 

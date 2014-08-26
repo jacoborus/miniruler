@@ -71,6 +71,19 @@ Context:
 - can
 
 
+Node.js tests
+-------------
+
+```sh
+npm test
+```
+
+Browser tests
+-------------
+
+Run test/test.html in your browser
+
+
 <br><br>
 
 ---
