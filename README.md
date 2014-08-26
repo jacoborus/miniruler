@@ -5,6 +5,8 @@ miniRuler
 ](https://ci.testling.com/jacoborus/miniruler)
 
 
+[![Build Status](https://travis-ci.org/jacoborus/miniruler.svg?branch=master)](https://travis-ci.org/jacoborus/miniruler)
+
 Manage roles in contexts asynchronously.
 
 **In early development**
