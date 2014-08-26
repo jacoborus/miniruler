@@ -1,6 +1,10 @@
 miniRuler
 =========
 
+[![browser support](https://ci.testling.com/jacoborus/miniruler.png)
+](https://ci.testling.com/jacoborus/miniruler)
+
+
 Manage roles in contexts asynchronously.
 
 **In early development**
