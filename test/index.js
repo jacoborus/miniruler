@@ -24,9 +24,9 @@ describe( 'miniruler', function () {
 
 describe( 'setLevels', function () {
 
-	it( 'launch callback automatically when no levels', function () {
+	it( 'launch callback automatically when no levels', function (done) {
 		ruler.setLevels( null, function () {
-			expect();
+			done();
 		});
 	});
 
@@ -49,6 +49,24 @@ describe( 'setLevels', function () {
 
 
 describe( 'removeLevels', function () {
+
+	it( 'automatically launch callback when no levels object', function (done) {
+		ruler.setLevels( null, function () {
+			done();
+		});
+	});
+
+	it( 'throw errors througth callback', function () {
+		ruler.setLevels( 1, function (err) {
+			expect( err ).to.exist
+		});
+	});
+
+	it( 'detect bad levels object', function () {
+		ruler.setLevels({ uno: 'uno' }, function (err) {
+			expect( err ).to.exist
+		});
+	});
 
 	it( 'remove a single role', function () {
 		ruler.setLevels({ testsinglerole: 3 });
@@ -77,6 +95,12 @@ var rules = {
 
 describe( 'setActions', function () {
 
+	it( 'automatically launch callback when no actions object', function (done) {
+		ruler.setActions( null, function () {
+			done();
+		});
+	});
+
 	it( 'requires a object with rules', function () {
 		ruler.setActions( 1, function (err) {
 			expect( err ).to.exist;
@@ -101,17 +125,42 @@ describe( 'setActions', function () {
 		expect( ruler._actions.tres.mainRoles[0] ).to.equal('superadmin');
 	});
 
-	it( 'launch setAction for every action', function () {
+	it( 'overwrite rules', function () {
 		ruler.setActions({
-			'cinco': rules,
-			'seis': rules
+			tres: {
+				level: 3,
+				roles: ['admin'],
+				parentLevel: 3,
+				parentRoles: ['admin'],
+				mainLevel: 9,
+				mainRoles: ['admin']
+			}
 		});
-		expect( ruler._actions.cinco.level ).to.equal(2);
-		expect( ruler._actions.seis.level ).to.equal(2);
+		expect( ruler._actions.tres.level ).to.equal(3);
+		expect( ruler._actions.tres.roles[0] ).to.equal('admin');
+		expect( ruler._actions.tres.parentLevel ).to.equal(3);
+		expect( ruler._actions.tres.parentRoles[0] ).to.equal('admin');
+		expect( ruler._actions.tres.mainLevel ).to.equal(9);
+		expect( ruler._actions.tres.mainRoles[0] ).to.equal('admin');
 	});
 });
 
 describe( 'removeActions', function () {
+
+	it( 'automatically launch callback when no actions object', function (done) {
+		ruler.removeActions( null, function () {
+			done();
+		});
+	});
+
+	it( 'requires a string or array with rules', function () {
+		ruler.removeActions( 1, function (err) {
+			expect( err ).to.exist;
+		});
+		ruler.removeActions( {}, function (err) {
+			expect( err ).to.exist;
+		});
+	});
 
 	it( 'remove a single action from context', function () {
 		ruler.setActions({ seven: rules });

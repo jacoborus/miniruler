@@ -4,23 +4,77 @@
 
 var Action;
 
+// Check if an object is an array
 var isArray = function (obj) {
 	return Object.prototype.toString.call( obj ) === '[object Array]';
 };
 
 /*!
- * Add or overwrite roles in context or resource
- * @param {[type]} roles [description]
+ * check if levels object has correct structure
+ * @param  {Object} obj roles and its levels
+ * @return {Boolean}     true if it's right
  */
-var setLevels = function (roles, cb) {
+var levelsStruc = function (obj) {
 	var i;
-	for (i in roles) {
-		if (!roles[i] && roles[i] !== 0) {
-			roles[i] = 1;
+	if (typeof obj !== 'object' || isArray( obj )) {
+		return false;
+	}
+	for (i in obj) {
+		if (typeof obj[i] !== 'number') {
+			return false;
 		}
-		this._levels[i] = roles[i];
+	}
+	return true;
+};
+
+/*!
+ * Add or overwrite levels in context or resource
+ * @param {[type]} levels [description]
+ */
+var setLevels = function (levels, cb) {
+	if (!levels) {
+		return cb();
+	}
+	if (!levelsStruc( levels )) {
+		return cb( 'Bad levels object structure' );
+	}
+	var i;
+	for (i in levels) {
+		if (!levels[i] && levels[i] !== 0) {
+			levels[i] = 1;
+		}
+		this._levels[i] = levels[i];
 	}
 	cb();
+};
+
+/*!
+ * check if actions object has correct structure
+ * @param  {Object} obj actions and its roles and levels
+ * @return {Boolean}     true if it's right
+ */
+var actionsStruc = function (obj) {
+	var i, el;
+	if (typeof obj !== 'object' || isArray( obj )) {
+		return false;
+	}
+	var arrs = ['roles', 'mainRoles', 'parentRoles'];
+	var nums = ['level', 'mainLevel', 'parentLevel'];
+
+	for (i in arrs) {
+		el = obj[arrs[i]];
+		if (el && !isArray( el )) {
+			console.log(el);
+			return false;
+		}
+	}
+	for (i in nums) {
+		el = obj[nums[i]];
+		if (el && typeof el !== 'number') {
+			return false;
+		}
+	}
+	return true;
 };
 
 /*!
@@ -28,11 +82,17 @@ var setLevels = function (roles, cb) {
  * @param {Object} actions actions and its rules
  */
 var setActions = function (actions, callback) {
-	var cb = callback || function () {};
+	var cb = callback || function () {},
+		i;
+	if (!actions) {
+		return cb();
+	}
+	if (!actionsStruc( actions )) {
+		return cb( 'Bad actions object structure' );
+	}
 	if (typeof actions !== 'object') {
 		return cb( new Error( 'ruler Context.setActions requires an action object' ));
 	}
-	var i;
 	for (i in actions) {
 		this._actions[i] = this._actions[i] || new Action();
 		this._actions[i].set( actions[i] );
@@ -40,12 +100,24 @@ var setActions = function (actions, callback) {
 	cb();
 };
 
+/*!
+ * Check if level is enough to perforn an action
+ * @param  {Number} level
+ * @param  {Onject} action action keyname
+ * @return {Boolean}        true if level is enough
+ */
 var checkLevel = function (level, action) {
 	return level >= this._actions[action].level;
 };
 
+/*!
+ * check if a role can perform an action
+ * @param  {String} role   role keyname
+ * @param  {String} action action keyname
+ * @return {Boolean}        true if role has permission
+ */
 var checkRole = function (role, action) {
-	var roles, a, l;
+	var roles, a;
 
 	if (this._actions[action]) {
 		roles = this._actions[action].roles;
@@ -145,9 +217,12 @@ var Context = function (ctx, parent, cb) {
 	this._levels = {};
 	this._actions = {};
 	ctx = ctx || {};
-	setLevels.call( this, ctx._levels  || {}, function () {
-		setActions.call( this, ctx._actions  || {}, function () {
+	setLevels.call( this, ctx._levels  || {}, function (errLev) {
+		setActions.call( this, ctx._actions  || {}, function (errAct) {
 			var i;
+			if (errLev || errAct) {
+				return cb( errLev || errAct );
+			}
 			for (i in ctx.contexts || {}) {
 				self[i]  = new Context( ctx.contexts[i], self, cb );
 			}
@@ -163,9 +238,6 @@ var Context = function (ctx, parent, cb) {
  */
 Context.prototype.setLevels = function (levels, callback) {
 	var cb = callback || function () {};
-	if (typeof levels !== 'object') {
-		return cb( new Error( 'setLevels requires a object as param' ));
-	}
 	setLevels.call( this, levels, cb );
 };
 

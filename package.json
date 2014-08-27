@@ -4,7 +4,7 @@
   "description": "Manage roles in contexts",
   "main": "index.js",
   "scripts": {
-    "test": "node ./node_modules/mocha/bin/mocha"
+    "test": "node ./node_modules/mocha/bin/mocha --ui bdd"
   },
   "private": true,
   "repository": {
@@ -18,8 +18,8 @@
   "testling": {
     "harness": "mocha-bdd",
     "files": "test/index.js",
+    "html": "test.html",
     "browsers": [
-      "ie/8..latest",
       "chrome/latest",
       "firefox/latest"
     ]
