@@ -261,8 +261,53 @@ var r3 = new miniruler();
 
 describe( 'allow', function () {
 
+	it( 'automatically launch callback when no actions object', function (done) {
+		r3.allow( null, null, function () {
+			done();
+		});
+	});
+
+	it( 'requires a number, string or array of strings with roles as roles param', function () {
+		r3.allow( {}, 'requires', function (err) {
+			expect( err ).to.exist;
+		});
+		r3.allow( 2, 'requires', function (err) {
+			expect( err ).to.not.exist;
+		});
+		r3.allow( 'admin', 'requires', function (err) {
+			expect( err ).to.not.exist;
+		});
+		r3.allow( ['author', 'user'], 'requires', function (err) {
+			expect( err ).to.not.exist;
+		});
+	});
+
 	it( 'give permission to a role to perform an action', function () {
 		r3.allow( 'user', 'post' );
 		expect( r3.can( 'user', 'post' )).to.equal( true );
+	});
+
+	it( 'give permission to a level to perform an action', function () {
+		expect( r3.can( 1, 'post' )).to.equal( false );
+		r3.allow( 1, 'post' );
+		expect( r3.can( 1, 'post' )).to.equal( true );
+	});
+});
+
+var r4 = new miniruler();
+
+describe( 'revoke', function () {
+
+	it( 'automatically launch callback when no actions object', function (done) {
+		r4.revoke( null, null, function () {
+			done();
+		});
+	});
+
+	it( 'remove permission to a role to perform an action', function () {
+		r4.allow( 'user', 'post' );
+		expect( r4.can( 'user', 'post' )).to.equal( true );
+		r4.revoke( 'user', 'post' );
+		expect( r4.can( 'user', 'post' )).to.equal( false );
 	});
 });

@@ -302,7 +302,7 @@ Context.prototype.removeActions = function (actions, callback) {
 
 /**
  * Grant permission to a user over an action
- * @param  {String|Number} role   role or level
+ * @param  {String|Array|Number} role   role , list of roles or level
  * @param  {String} action action keyname
  * @param {Function} callback Signature: error
  */
@@ -310,6 +310,18 @@ Context.prototype.allow = function (roles, action, callback) {
 	var cb = callback || function () {};
 	if (!roles) {
 		return cb();
+	}
+	if (typeof roles === 'number') {
+		if (!this._actions[action]) {
+			this._actions[action] = new Action();
+		}
+		this._actions[action].level = roles;
+		return cb();
+	}
+	if (typeof roles === 'string') {
+		roles = [roles];
+	} else if (!isArray( roles )) {
+		return cb( 'bad roles argument' );
 	}
 	if (!this._actions[action]) {
 		this._actions[action] = new Action();
