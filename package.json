@@ -4,7 +4,8 @@
   "description": "Manage roles in contexts",
   "main": "index.js",
   "scripts": {
-    "test": "node ./node_modules/mocha/bin/mocha --ui bdd"
+    "test": "node ./node_modules/mocha/bin/mocha",
+    "build-docs": "node ./docs/createdocs.js && cat ./docs/readme.md ./docs/api.md ./docs/footer.md > ./README.md"
   },
   "private": true,
   "repository": {
@@ -32,6 +33,7 @@
   "homepage": "https://github.com/jacoborus/miniruler",
   "devDependencies": {
     "chai": "^1.9.1",
-    "mocha": "^1.21.4"
+    "mocha": "^1.21.4",
+    "updox": "0.0.5"
   }
 }
