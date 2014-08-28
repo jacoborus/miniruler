@@ -7,7 +7,6 @@
     "test": "node ./node_modules/mocha/bin/mocha",
     "build-docs": "node ./docs/createdocs.js && cat ./docs/readme.md ./docs/api.md ./docs/footer.md > ./README.md"
   },
-  "private": true,
   "repository": {
     "type": "git",
     "url": "git@github.com:jacoborus/miniruler.git"
