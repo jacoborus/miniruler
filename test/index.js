@@ -180,29 +180,45 @@ describe( 'removeActions', function () {
 describe( 'addContext', function () {
 
 	it( 'requires a string keyname for the context', function () {
-		expect( function () {
-			ruler.addContext( 23 );
-		}).to.throw( 'context.addContext method requires a String name' );
+		ruler.addContext( 23, {}, function (err) {
+			expect( err ).to.exist;
+		});
 	});
 
 	it( 'requires context to be a object', function () {
-		expect( function () {
-			ruler.addContext( 'subcontext', 2 );
-		}).to.throw( 'context.addContext method requires a Object ctx' );
+		ruler.addContext( 'subcontext', 2, function (err) {
+			expect( err ).to.exist;
+		});
 	});
 
 	it( 'link parent context to subcontext', function () {
-		ruler.addContext( 'subcontext', {} );
-		expect( ruler.contexts.subcontext.parent.key ).to.equal( 'main' );
+		ruler.addContext( 'subcontext', {}, function (){
+			expect( ruler.contexts.subcontext.parent.key ).to.equal( 'main' );
+		});
 	});
 });
 
 describe( 'removeContext', function () {
 
+	it( 'requires a role name or an array of them', function () {
+		ruler.removeContext( 23, function (err) {
+			expect( err ).to.exist;
+		});
+	});
+
 	it( 'remove child context from context', function () {
 		ruler.addContext( 'childCtx' );
 		ruler.removeContext( 'childCtx' );
 		expect( ruler.contexts.childCtx ).to.not.exist;
+	});
+
+	it( 'remove an array of child contexts from context', function () {
+		ruler.addContext( 'childCtx2' );
+		ruler.addContext( 'childCtx3' );
+		ruler.removeContext( ['childCtx2', 'childCtx3'], function () {
+			expect( ruler.contexts.childCtx2 ).to.not.exist;
+			expect( ruler.contexts.childCtx3 ).to.not.exist;
+		});
 	});
 });
 

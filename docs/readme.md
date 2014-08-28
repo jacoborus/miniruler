@@ -9,6 +9,13 @@ miniruler
 
 Manage roles in contexts asynchronously.
 
+Installation
+------------
+
+```
+npm install miniruler
+```
+
 
 Example
 -------

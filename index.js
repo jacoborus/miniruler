@@ -352,16 +352,15 @@ Context.prototype.revoke = function (roles, action, callback) {
  * Add a child context
  * @param {String} name keyname for context
  * @param {Object} ctx  context properties
+ * @param {Function} callback signature: error
  */
 Context.prototype.addContext = function (name, ctx, callback) {
-	if (this.contexts[name]) {
-		throw Error;
-	}
+	var cb = callback || function () {};
 	if (typeof name !== 'string') {
-		throw new Error( 'context.addContext method requires a String name' );
+		cb( new Error( 'context.addContext method requires a String name' ));
 	}
 	if (typeof ctx !== 'undefined' && typeof ctx !== 'object') {
-		throw new Error( 'context.addContext method requires a Object ctx' );
+		cb( new Error( 'context.addContext method requires a Object ctx' ));
 	}
 	this.contexts[name] = new Context( ctx, this, callback );
 };
@@ -369,12 +368,19 @@ Context.prototype.addContext = function (name, ctx, callback) {
 
 /**
  * remove context from parent context
- * @param  {String} name name of the context
+ * @param  {String||Array} context context keyname of an array of keynames
+ * @param {Function} callback signature: error
  */
-Context.prototype.removeContext = function (name, callback) {
+Context.prototype.removeContext = function (context, callback) {
+	var i;
 	var cb = callback || function () {};
-	if (this.contexts[name]) {
-		delete this.contexts[name];
+	if (typeof context === 'string') {
+		context = [context];
+	} else if (!isArray( context )) {
+		return cb( 'bad context argument' );
+	}
+	for (i in context) {
+		delete this.contexts[context[i]];
 	}
 	cb();
 };

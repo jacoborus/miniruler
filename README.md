@@ -9,6 +9,13 @@ miniruler
 
 Manage roles in contexts asynchronously.
 
+Installation
+------------
+
+```
+npm install miniruler
+```
+
 
 Example
 -------
@@ -141,23 +148,25 @@ Revoke permission to a user over an action
 
 
 <a name="addContext"></a>
-addContext( name, ctx )
+addContext( name, ctx, callback )
 ------------------------------------------------------------
 
 Add a child context
 **Parameters:**
 - **name** *String*: keyname for context
 - **ctx** *Object*: context properties
+- **callback** *Function*: signature: error
 
 
 
 <a name="removeContext"></a>
-removeContext( name )
+removeContext( context, callback )
 ------------------------------------------------------------
 
 remove context from parent context
 **Parameters:**
-- **name** *String*: name of the context
+- **context** *String||Array*: context keyname of an array of keynames
+- **callback** *Function*: signature: error
 
 
 
