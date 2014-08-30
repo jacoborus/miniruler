@@ -320,6 +320,21 @@ describe( 'revoke', function () {
 		});
 	});
 
+	it( 'requires a string or array of strings with roles as roles param', function () {
+		r4.revoke( {}, 'requires', function (err) {
+			expect( err ).to.exist;
+		});
+		r4.revoke( 2, 'requires', function (err) {
+			expect( err ).to.exist;
+		});
+		r4.revoke( 'admin', 'requires', function (err) {
+			expect( err ).to.not.exist;
+		});
+		r4.revoke( ['author', 'user'], 'requires', function (err) {
+			expect( err ).to.not.exist;
+		});
+	});
+
 	it( 'remove permission to a role to perform an action', function () {
 		r4.allow( 'user', 'post' );
 		expect( r4.can( 'user', 'post' )).to.equal( true );

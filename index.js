@@ -341,6 +341,11 @@ Context.prototype.revoke = function (roles, action, callback) {
 	if (!roles) {
 		return cb();
 	}
+	if (typeof roles === 'string') {
+		roles = [roles];
+	} else if (!isArray( roles )) {
+		return cb( 'bad roles argument' );
+	}
 	if (this._actions[action]) {
 		return this._actions[action].revoke( roles, cb );
 	}
