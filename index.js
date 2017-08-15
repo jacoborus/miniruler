@@ -3,10 +3,6 @@ function isArray (obj) {
   return Object.prototype.toString.call(obj) === '[object Array]'
 }
 
-// function areLevelsNumbers (roles) {
-//   return !roles.some(role => typeof role !== 'string')
-// }
-
 function areRolesStrings (roles) {
   return !roles.some(role => typeof role !== 'string')
 }
@@ -16,12 +12,6 @@ function checkRolesType (roles) {
   if (!isArray(roles)) throw new Error('Wrong type for roles')
   if (!areRolesStrings(roles)) throw new Error('Some roles are not String type')
 }
-
-// function checkLevels (levels) {
-//   if (!levels) return true
-//   if (!isArray(levels)) throw new Error('Wrong type for levels')
-//   if (!areLevelsNumbers(levels)) throw new Error('Some levels are not number type')
-// }
 
 function checkLevelType (level) {
   if (level === 0 || typeof level === 'undefined') return true
@@ -38,7 +28,6 @@ function createAction (name, {roles = [], level} = {}) {
   checkActionName(name)
   checkLevelType(level)
   checkRolesType(roles)
-  // checkLevels(levels)
   if (actions.has(name)) throw new Error(`Action ${name} already exists`)
   const action = { roles: new Set(roles) }
   if (typeof level === 'undefined') action.noLevel = true
