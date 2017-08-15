@@ -40,7 +40,7 @@ function createAction (name, {roles = [], level} = {}) {
   checkRolesType(roles)
   // checkLevels(levels)
   if (actions.has(name)) throw new Error(`Action ${name} already exists`)
-  const action = { roles }
+  const action = { roles: new Set(roles) }
   if (typeof level === 'undefined') action.noLevel = true
   else action.level = level
   actions.set(name, action)
@@ -50,9 +50,11 @@ function can (user, actionName) {
   const action = actions.get(actionName)
   if (!action) throw new Error('Action doesn\'t exists')
   if (typeof user === 'string') return action.roles.has(user)
-  else {
+  else if (typeof user === 'number') {
     if (action.noLevel) return false
-    else return actions.level < user
+    else return action.level >= user
+  } else {
+    throw new Error(`wrong role checking ${actionName}`)
   }
 }
 

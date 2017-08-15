@@ -19,10 +19,10 @@ test('createAction: error checking', t => {
     'action roles should be an array of strings (arr with wrong types inside, object)'
   )
   t.doesNotThrow(
-    () => { r.createAction('r1', {roles: []}) }, 'action roles should be an array (arr)'
+    () => { r.createAction('rr1', {roles: []}) }, 'action roles should be an array (arr)'
   )
   t.doesNotThrow(
-    () => { r.createAction('r2', {roles: ['role1', 'role2']}) },
+    () => { r.createAction('rr2', {roles: ['role1', 'role2']}) },
     'action roles should be an array of strings'
   )
   // action levels
@@ -31,5 +31,21 @@ test('createAction: error checking', t => {
   t.throws(() => { r.createAction('e', {level: []}) }, 'action level should be an number (obj)')
   t.doesNotThrow(() => { r.createAction('rl1', {level: 0}) }, 'action level should be an number')
   t.doesNotThrow(() => { r.createAction('rl2', {level: 99}) }, 'action level should be an number')
+  t.end()
+})
+
+test('can', t => {
+  // with roles
+  r.createAction('testRoles', {roles: ['admin', 'other']})
+  t.ok(r.can('admin', 'testRoles'), 'can: check roles')
+  t.ok(r.can('other', 'testRoles'), 'can: check roles')
+  t.notOk(r.can('another', 'testRoles'), 'can: check roles')
+  // with levels
+  r.createAction('testLevel', {level: 2})
+  t.ok(r.can(0, 'testLevel'), 'can: check level true')
+  t.notOk(r.can(3, 'testLevel'), 'can: check level false')
+  // type checking
+  t.throws(() => r.can('asdfasdf', 'asdf'), 'check the action to exists')
+  t.throws(() => r.can('asdfasdf', []), 'check the action type')
   t.end()
 })
