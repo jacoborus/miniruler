@@ -1,11 +1,12 @@
 {
   "name": "miniruler",
-  "version": "0.0.3",
+  "version": "0.1.0",
   "description": "Manage roles in contexts",
   "main": "index.js",
   "scripts": {
-    "test": "node ./node_modules/mocha/bin/mocha",
-    "build-docs": "node ./docs/createdocs.js && cat ./docs/readme.md ./docs/api.md ./docs/footer.md > ./README.md"
+    "test": "node test",
+    "build-docs": "node ./docs/createdocs.js && cat ./docs/readme.md ./docs/api.md ./docs/footer.md > ./README.md",
+    "linter": "standard 'index.js'"
   },
   "repository": {
     "type": "git",
@@ -15,15 +16,6 @@
     "roles",
     "permissions"
   ],
-  "testling": {
-    "harness": "mocha-bdd",
-    "files": "test/index.js",
-    "html": "test.html",
-    "browsers": [
-      "chrome/latest",
-      "firefox/latest"
-    ]
-  },
   "author": "Jacobo Tabernero <jacobo@xarope.eu>",
   "license": "MIT",
   "bugs": {
@@ -31,8 +23,8 @@
   },
   "homepage": "https://github.com/jacoborus/miniruler",
   "devDependencies": {
-    "chai": "^1.9.1",
-    "mocha": "^1.21.4",
+    "standard": "10.0.3",
+    "tape": "4.8.0",
     "updox": "0.0.5"
   }
 }
