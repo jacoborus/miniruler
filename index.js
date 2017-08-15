@@ -47,9 +47,16 @@ function can (user, actionName) {
   }
 }
 
+function revoke (actionName, role) {
+  const action = actions.get(actionName)
+  if (!action) throw new Error('Action doesn\'t exists')
+  action.roles.delete(role)
+}
+
 const actions = new Map()
 
 module.exports = {
   createAction,
+  revoke,
   can
 }

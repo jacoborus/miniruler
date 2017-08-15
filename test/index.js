@@ -49,3 +49,11 @@ test('can', t => {
   t.throws(() => r.can('asdfasdf', []), 'check the action type')
   t.end()
 })
+
+test('revoke', t => {
+  r.createAction('forRevoke', {roles: ['uno']})
+  t.ok(r.can('uno', 'forRevoke'), 'pretest revoke role permission')
+  r.revoke('forRevoke', 'uno')
+  t.notOk(r.can('uno', 'forRevoke'), 'revoke role permission')
+  t.end()
+})
