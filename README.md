@@ -21,15 +21,13 @@ Example
 -------
 
 ```js
-const Ruler = require('miniruler')
-const ruler = new Ruler()
+const ruler = require('miniruler')
 
 /* - action roles - */
 
-ruler.createAction(
-  'manageSettings',
-  { roles: ['admin', 'user'] }
-)
+ruler.createAction('manageSettings', {
+  roles: ['admin', 'user']
+})
 
 ruler.can( 'admin', 'manageSettings' )  // => true
 ruler.can( 'author', 'manageSettings' )  // => false
@@ -42,18 +40,17 @@ ruler.createAction(
   { level: 0 }
 )
 
-ruler.can(0, 'manageSettings'), 'can: check level true')
-ruler.can(2, 'manageSettings'), 'can: check level false')
+ruler.can(0, 'manageSettings') // true
+ruler.can(2, 'manageSettings') // false
 
 
 /* - revoke - */
 
 ruler.revoke('manageSettings', 'user')
 
-ruler.can( 'user', 'manageSettings' )  // => false
-ruler.can( 'admin', 'manageSettings' ) // => admin
+ruler.can('user', 'manageSettings')  // => false
+ruler.can('admin', 'manageSettings') // => admin
 
-// ...
 ```
 index API
 ============
