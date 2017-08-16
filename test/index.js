@@ -1,7 +1,7 @@
 const test = require('tape')
 const r = require('..')
 
-test('createAction: error checking', t => {
+test('createAction', t => {
   // action name
   t.throws(() => { r.createAction() }, 'action name should be present')
   t.throws(() => { r.createAction(1) }, 'action name should be a string')
@@ -28,8 +28,9 @@ test('createAction: error checking', t => {
   // action levels
   t.throws(() => { r.createAction('e', {level: 's'}) }, 'action level should be an number (str)')
   t.throws(() => { r.createAction('e', {level: {}}) }, 'action level should be an number (obj)')
-  t.throws(() => { r.createAction('e', {level: []}) }, 'action level should be an number (obj)')
+  t.throws(() => { r.createAction('e', {level: []}) }, 'action level should be an number (arr)')
   t.doesNotThrow(() => { r.createAction('rl1', {level: 0}) }, 'action level should be an number')
+  t.throws(() => { r.createAction('rl1', {level: 0}) }, 'action should be unique')
   t.doesNotThrow(() => { r.createAction('rl2', {level: 99}) }, 'action level should be an number')
   t.end()
 })
@@ -43,6 +44,7 @@ test('can', t => {
   // with levels
   r.createAction('testLevel', {level: 2})
   t.ok(r.can(0, 'testLevel'), 'can: check level true')
+  t.ok(r.can(2, 'testLevel'), 'can: check level true')
   t.notOk(r.can(3, 'testLevel'), 'can: check level false')
   // type checking
   t.throws(() => r.can('asdfasdf', 'asdf'), 'check the action to exists')

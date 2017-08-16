@@ -21,48 +21,37 @@ Example
 -------
 
 ```js
-var Ruler = require( 'miniruler' ),
-    ruler = new Ruler();
+const Ruler = require('miniruler')
+const ruler = new Ruler()
 
-/* - basic roles - */
+/* - action roles - */
 
-ruler.setActions({
-    manageSettings: {
-        roles: ['admin']
-    },
-    post: {
-        roles: ['author', 'user']
-    }
-});
+ruler.createAction(
+  'manageSettings',
+  { roles: ['admin', 'user'] }
+)
 
-ruler.can( 'admin', 'manageSettings' );  // => true
-ruler.can( 'author', 'manageSettings' );  // => false
+ruler.can( 'admin', 'manageSettings' )  // => true
+ruler.can( 'author', 'manageSettings' )  // => false
 
 
-/* - work with levels - */
+/* - action levels - */
 
-ruler.setLevels({
-    'admin': 5, // role name and level
-    'author': 4,
-    'user': 3,
-    'member': 1
-});
+ruler.createAction(
+  'manageSettings',
+  { level: 0 }
+)
 
-ruler.setActions({ comment: {
-    level: 2
-}});
-
-ruler.can( 1, 'comment' );  // => false
-ruler.can( 'user', 'comment' );  // => true
+ruler.can(0, 'manageSettings'), 'can: check level true')
+ruler.can(2, 'manageSettings'), 'can: check level false')
 
 
-/* - Contexts - */
+/* - revoke - */
 
-ruler.addContext('wiki');
+ruler.revoke('manageSettings', 'user')
 
-ruler.wiki.setLevels({
-    // ...
-});
+ruler.can( 'user', 'manageSettings' )  // => false
+ruler.can( 'admin', 'manageSettings' ) // => admin
 
 // ...
 ```
@@ -70,47 +59,9 @@ index API
 ============
 
 
-- [Context](#Context)
-- [setLevels](#setLevels)
-- [removeLevels](#removeLevels)
-- [setActions](#setActions)
-- [allow](#allow)
+- [createAction](#createAction)
 - [revoke](#revoke)
-- [addContext](#addContext)
-- [removeContext](#removeContext)
 - [can](#can)
-
-<a name="Context"></a>
-Context( ctx )
-------------------------------------------------------------
-
-Context constructor
-**Parameters:**
-- **ctx** *Object*: [description]
-
-
-
-<a name="setLevels"></a>
-setLevels( levels, callback )
-------------------------------------------------------------
-
-Add or update levels to a context
-**Parameters:**
-- **levels** *Object*: Roles names and its levels
-- **callback** *Function*: Signature: error
-
-
-
-<a name="removeLevels"></a>
-removeLevels( roles, callback )
-------------------------------------------------------------
-
-Remove one or multiple roles from context
-**Parameters:**
-- **roles** *String|Array*: role or list of roles to delete
-- **callback** *Function*: Signature: error
-
-
 
 <a name="setActions"></a>
 setActions( actions, callback )
@@ -119,18 +70,6 @@ setActions( actions, callback )
 Add or update actions in context
 **Parameters:**
 - **actions** *Object*: action rules
-- **callback** *Function*: Signature: error
-
-
-
-<a name="allow"></a>
-allow( role, action, callback )
-------------------------------------------------------------
-
-Grant permission to a user over an action
-**Parameters:**
-- **role** *String|Array|Number*: role , list of roles or level
-- **action** *String*: action keyname
 - **callback** *Function*: Signature: error
 
 
@@ -144,29 +83,6 @@ Revoke permission to a user over an action
 - **role** *String*: role name
 - **action** *String*: action name
 - **callback** *Function*: Signature: error
-
-
-
-<a name="addContext"></a>
-addContext( name, ctx, callback )
-------------------------------------------------------------
-
-Add a child context
-**Parameters:**
-- **name** *String*: keyname for context
-- **ctx** *Object*: context properties
-- **callback** *Function*: signature: error
-
-
-
-<a name="removeContext"></a>
-removeContext( context, callback )
-------------------------------------------------------------
-
-remove context from parent context
-**Parameters:**
-- **context** *String||Array*: context keyname of an array of keynames
-- **callback** *Function*: signature: error
 
 
 
