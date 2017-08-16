@@ -43,6 +43,7 @@ test('can', t => {
   // with levels
   r.createAction('testLevel', {level: 2})
   t.ok(r.can(0, 'testLevel'), 'can: check level true')
+  t.ok(r.can(2, 'testLevel'), 'can: check level true')
   t.notOk(r.can(3, 'testLevel'), 'can: check level false')
   // type checking
   t.throws(() => r.can('asdfasdf', 'asdf'), 'check the action to exists')
