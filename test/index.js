@@ -1,7 +1,7 @@
 const test = require('tape')
 const r = require('..')
 
-test('createAction: error checking', t => {
+test('createAction', t => {
   // action name
   t.throws(() => { r.createAction() }, 'action name should be present')
   t.throws(() => { r.createAction(1) }, 'action name should be a string')
