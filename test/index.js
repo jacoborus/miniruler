@@ -30,6 +30,7 @@ test('createAction', t => {
   t.throws(() => { r.createAction('e', {level: {}}) }, 'action level should be an number (obj)')
   t.throws(() => { r.createAction('e', {level: []}) }, 'action level should be an number (arr)')
   t.doesNotThrow(() => { r.createAction('rl1', {level: 0}) }, 'action level should be an number')
+  t.throws(() => { r.createAction('rl1', {level: 0}) }, 'action should be unique')
   t.doesNotThrow(() => { r.createAction('rl2', {level: 99}) }, 'action level should be an number')
   t.end()
 })
