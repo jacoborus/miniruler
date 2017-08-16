@@ -5,7 +5,6 @@
   "main": "index.js",
   "scripts": {
     "test": "node test",
-    "build-docs": "node ./docs/createdocs.js && cat ./docs/readme.md ./docs/api.md ./docs/footer.md > ./README.md",
     "linter": "standard 'index.js'"
   },
   "repository": {
@@ -24,7 +23,6 @@
   "homepage": "https://github.com/jacoborus/miniruler",
   "devDependencies": {
     "standard": "10.0.3",
-    "tape": "4.8.0",
-    "updox": "0.0.5"
+    "tape": "4.8.0"
   }
 }
