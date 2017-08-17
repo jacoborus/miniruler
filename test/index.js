@@ -35,17 +35,26 @@ test('createAction', t => {
   t.end()
 })
 
+test('setRoles', t => {
+  t.throws(() => r.setRoles([]), 'roles for setRoles should be a object (arr)')
+  t.throws(() => r.setRoles({user: 'hh'}), 'roles for setRoles should be a object with string - number')
+  t.doesNotThrow(() => r.setRoles({admin: 0}), 'setRoles accept valid role objects')
+  t.end()
+})
+
+test('addRole', t => {
+  t.throws(() => r.addRole('user', 'ss'), 'role for addRole should be a pair of string- number (str)')
+  t.throws(() => r.addRole(), 'addRole require a roleName')
+  t.doesNotThrow(() => r.addRole('user', 3), 'addRole accept valid pair of string - number')
+  t.end()
+})
+
 test('can', t => {
   // with roles
   r.createAction('testRoles', {roles: ['admin', 'other']})
   t.ok(r.can('admin', 'testRoles'), 'can: check roles')
   t.ok(r.can('other', 'testRoles'), 'can: check roles')
   t.notOk(r.can('another', 'testRoles'), 'can: check roles')
-  // with levels
-  r.createAction('testLevel', {level: 2})
-  t.ok(r.can(0, 'testLevel'), 'can: check level true')
-  t.ok(r.can(2, 'testLevel'), 'can: check level true')
-  t.notOk(r.can(3, 'testLevel'), 'can: check level false')
   // type checking
   t.throws(() => r.can('asdfasdf', 'asdf'), 'check the action to exists')
   t.throws(() => r.can('asdfasdf', []), 'check the action type')

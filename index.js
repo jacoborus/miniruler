@@ -3,6 +3,10 @@ function isArray (obj) {
   return Object.prototype.toString.call(obj) === '[object Array]'
 }
 
+function isObject (obj) {
+  return Object.prototype.toString.call(obj) === '[object Object]'
+}
+
 function areRolesStrings (roles) {
   return !roles.some(role => typeof role !== 'string')
 }
@@ -35,16 +39,14 @@ function createAction (name, {roles = [], level} = {}) {
   actions.set(name, action)
 }
 
-function can (user, actionName) {
+function can (roleName, actionName) {
   const action = actions.get(actionName)
   if (!action) throw new Error('Action doesn\'t exists')
-  if (typeof user === 'string') return action.roles.has(user)
-  else if (typeof user === 'number') {
-    if (action.noLevel) return false
-    else return action.level >= user
-  } else {
-    throw new Error(`wrong role checking ${actionName}`)
-  }
+  if (action.roles.has(roleName)) return true
+  if (action.noLevel) return false
+  const role = contextRoles.get(roleName)
+  if (!role) return false
+  return role <= action.level
 }
 
 function revoke (actionName, role) {
@@ -53,9 +55,37 @@ function revoke (actionName, role) {
   action.roles.delete(role)
 }
 
+function checkRolesObj (roles) {
+  if (!isObject(roles)) throw new Error('Roles has to be a object')
+  if (Object.keys(roles).some(roleName => typeof roles[roleName] !== 'number')) {
+    throw new Error('Invalid roles object')
+  }
+}
+
+function setRoles (roles) {
+  checkRolesObj(roles)
+  Object.keys(roles).forEach(roleName => {
+    contextRoles.set(roleName, roles[roleName])
+  })
+}
+
+function addRole (roleName, level) {
+  if (typeof level !== 'number') throw new Error('Level has to be a number')
+  if (!roleName) throw new Error('addRole requires a roleName and a level')
+  contextRoles.set(roleName, level)
+}
+
+function removeRole (roleName) {
+  contextRoles.delete(roleName)
+}
+
 const actions = new Map()
+const contextRoles = new Map()
 
 module.exports = {
+  setRoles,
+  addRole,
+  removeRole,
   createAction,
   revoke,
   can
