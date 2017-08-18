@@ -1,6 +1,7 @@
 const test = require('tape')
 const r = require('..')
 
+// related to context
 test('createAction', t => {
   // action name
   t.throws(() => { r.createAction() }, 'action name should be present')
@@ -49,15 +50,23 @@ test('addRole', t => {
   t.end()
 })
 
-test('can', t => {
-  // with roles
-  r.createAction('testRoles', {roles: ['admin', 'other']})
-  t.ok(r.can('admin', 'testRoles'), 'can: check roles')
-  t.ok(r.can('other', 'testRoles'), 'can: check roles')
-  t.notOk(r.can('another', 'testRoles'), 'can: check roles')
-  // type checking
-  t.throws(() => r.can('asdfasdf', 'asdf'), 'check the action to exists')
-  t.throws(() => r.can('asdfasdf', []), 'check the action type')
+// related to action
+test('setLevel', t => {
+  // error checking
+  t.throws(() => r.setLevel(), /setLevel requires a actionName/, 'setLevel requires a actionName')
+  t.throws(() => r.setLevel('action that not exists'), /action doesn't exists/, 'action doesn\'t exists')
+  // perform set level as undefined remove level
+  r.createAction('for setLevel', {level: 1})
+  t.throws(() => r.setLevel('for setLevel', {}),
+    /Action level has to be a number, undefined or null/,
+    'check level type'
+  )
+  r.setRoles({levelUser: 1})
+  t.ok(r.can('levelUser', 'for setLevel'), 'pretest')
+  r.setLevel('for setLevel')
+  t.notOk(r.can('levelUser', 'for setLevel'), 'setLevel undefined remove the level')
+  r.setLevel('for setLevel', 0)
+  t.notOk(r.can('levelUser', 'for setLevel'), 'basic set level')
   t.end()
 })
 
@@ -66,5 +75,18 @@ test('revoke', t => {
   t.ok(r.can('uno', 'forRevoke'), 'pretest revoke role permission')
   r.revoke('forRevoke', 'uno')
   t.notOk(r.can('uno', 'forRevoke'), 'revoke role permission')
+  t.end()
+})
+
+// general
+test('can', t => {
+  // type checking
+  t.throws(() => r.can('asdfasdf', 'asdf'), 'check the action to exists')
+  t.throws(() => r.can('asdfasdf', []), 'check the action type')
+  // with roles
+  r.createAction('testRoles', {roles: ['admin', 'other']})
+  t.ok(r.can('admin', 'testRoles'), 'can: check roles')
+  t.ok(r.can('other', 'testRoles'), 'can: check roles')
+  t.notOk(r.can('another', 'testRoles'), 'can: check roles')
   t.end()
 })

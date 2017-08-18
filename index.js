@@ -13,13 +13,14 @@ function areRolesStrings (roles) {
 
 function checkRolesType (roles) {
   if (typeof roles === 'undefined') return true
+  console.log(roles)
   if (!isArray(roles)) throw new Error('Wrong type for roles')
   if (!areRolesStrings(roles)) throw new Error('Some roles are not String type')
 }
 
 function checkLevelType (level) {
-  if (level === 0 || typeof level === 'undefined') return true
-  if (typeof level !== 'number') throw new Error('Action level has to be a number')
+  if (level === 0 || typeof level === 'undefined' || level === null) return true
+  if (typeof level !== 'number') throw new Error('Action level has to be a number, undefined or null')
 }
 
 function checkActionName (name) {
@@ -28,14 +29,18 @@ function checkActionName (name) {
   }
 }
 
-function createAction (name, {roles = [], level} = {}) {
+function createAction (name, {roles = [], level = null}) {
   checkActionName(name)
   checkLevelType(level)
   checkRolesType(roles)
   if (actions.has(name)) throw new Error(`Action ${name} already exists`)
   const action = { roles: new Set(roles) }
-  if (typeof level === 'undefined') action.noLevel = true
-  else action.level = level
+  if (typeof level === 'undefined' || level === null) {
+    action.noLevel = true
+  } else {
+    action.level = level
+    action.noLevel = false
+  }
   actions.set(name, action)
 }
 
@@ -45,7 +50,7 @@ function can (roleName, actionName) {
   if (action.roles.has(roleName)) return true
   if (action.noLevel) return false
   const role = contextRoles.get(roleName)
-  if (!role) return false
+  if (typeof role === 'undefined') return false
   return role <= action.level
 }
 
@@ -71,7 +76,7 @@ function setRoles (roles) {
 
 function addRole (roleName, level) {
   if (typeof level !== 'number') throw new Error('Level has to be a number')
-  if (!roleName) throw new Error('addRole requires a roleName and a level')
+  if (!roleName) throw new Error('addRole requires a roleName')
   contextRoles.set(roleName, level)
 }
 
@@ -79,14 +84,32 @@ function removeRole (roleName) {
   contextRoles.delete(roleName)
 }
 
+function setLevel (actionName, level) {
+  checkLevelType(level)
+  if (!actionName) throw new Error('setLevel requires a actionName')
+  const action = actions.get(actionName)
+  if (!action) throw new Error('action doesn\'t exists')
+  if (typeof level === 'undefined' || level === null) {
+    action.noLevel = true
+    delete action.level
+  } else {
+    action.level = level
+    action.noLevel = false
+  }
+}
+
 const actions = new Map()
 const contextRoles = new Map()
 
 module.exports = {
+  // related to context
   setRoles,
   addRole,
   removeRole,
   createAction,
+  // related to action
+  // allow,
   revoke,
+  setLevel,
   can
 }
