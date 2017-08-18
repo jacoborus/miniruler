@@ -13,6 +13,8 @@ test('addRole', t => {
   t.throws(() => r.addRole('user', 'ss'), 'role for addRole should be a pair of string- number (str)')
   t.throws(() => r.addRole(), 'addRole require a roleName')
   t.doesNotThrow(() => r.addRole('user', 3), 'addRole accept valid pair of string - number')
+  r.createAction('forAddRole', {level: 5})
+  t.ok(r.can('user', 'forAddRole'), 'can perform after addRole')
   t.end()
 })
 
