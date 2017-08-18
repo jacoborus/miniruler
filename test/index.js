@@ -2,6 +2,26 @@ const test = require('tape')
 const r = require('..')
 
 // related to context
+test('setRoles', t => {
+  t.throws(() => r.setRoles([]), 'roles for setRoles should be a object (arr)')
+  t.throws(() => r.setRoles({user: 'hh'}), 'roles for setRoles should be a object with string - number')
+  t.doesNotThrow(() => r.setRoles({admin: 0}), 'setRoles accept valid role objects')
+  t.end()
+})
+
+test('addRole', t => {
+  t.throws(() => r.addRole('user', 'ss'), 'role for addRole should be a pair of string- number (str)')
+  t.throws(() => r.addRole(), 'addRole require a roleName')
+  t.doesNotThrow(() => r.addRole('user', 3), 'addRole accept valid pair of string - number')
+  t.end()
+})
+
+test('removeRole', t => {
+  // TODO
+  t.end()
+})
+
+// RELATED TO ACTIONS
 test('createAction', t => {
   // action name
   t.throws(() => { r.createAction() }, 'action name should be present')
@@ -36,21 +56,19 @@ test('createAction', t => {
   t.end()
 })
 
-test('setRoles', t => {
-  t.throws(() => r.setRoles([]), 'roles for setRoles should be a object (arr)')
-  t.throws(() => r.setRoles({user: 'hh'}), 'roles for setRoles should be a object with string - number')
-  t.doesNotThrow(() => r.setRoles({admin: 0}), 'setRoles accept valid role objects')
+test('allow', t => {
+  // TODO
   t.end()
 })
 
-test('addRole', t => {
-  t.throws(() => r.addRole('user', 'ss'), 'role for addRole should be a pair of string- number (str)')
-  t.throws(() => r.addRole(), 'addRole require a roleName')
-  t.doesNotThrow(() => r.addRole('user', 3), 'addRole accept valid pair of string - number')
+test('revoke', t => {
+  r.createAction('forRevoke', {roles: ['uno']})
+  t.ok(r.can('uno', 'forRevoke'), 'pretest revoke role permission')
+  r.revoke('forRevoke', 'uno')
+  t.notOk(r.can('uno', 'forRevoke'), 'revoke role permission')
   t.end()
 })
 
-// related to action
 test('setLevel', t => {
   // error checking
   t.throws(() => r.setLevel(), /setLevel requires a actionName/, 'setLevel requires a actionName')
@@ -70,15 +88,7 @@ test('setLevel', t => {
   t.end()
 })
 
-test('revoke', t => {
-  r.createAction('forRevoke', {roles: ['uno']})
-  t.ok(r.can('uno', 'forRevoke'), 'pretest revoke role permission')
-  r.revoke('forRevoke', 'uno')
-  t.notOk(r.can('uno', 'forRevoke'), 'revoke role permission')
-  t.end()
-})
-
-// general
+// GENERAL
 test('can', t => {
   // type checking
   t.throws(() => r.can('asdfasdf', 'asdf'), 'check the action to exists')
