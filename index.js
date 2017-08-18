@@ -17,7 +17,6 @@ function areRolesStrings (roles) {
 
 function checkRolesType (roles) {
   if (typeof roles === 'undefined') return true
-  console.log(roles)
   if (!isArray(roles)) throw new Error('Wrong type for roles')
   if (!areRolesStrings(roles)) throw new Error('Some roles are not String type')
 }
@@ -61,7 +60,7 @@ function removeRole (roleName) {
 
 // RELATED TO ACTIONS
 
-function createAction (name, {roles = [], level = null}) {
+function createAction (name, {roles = [], level = null} = {roles: [], level: null}) {
   checkActionName(name)
   checkLevelType(level)
   checkRolesType(roles)
@@ -74,6 +73,14 @@ function createAction (name, {roles = [], level = null}) {
     action.noLevel = false
   }
   actions.set(name, action)
+}
+
+function allow (roleName, actionName) {
+  if (!roleName) throw new Error('allow method requires a role')
+  if (!actionName) throw new Error('allow method requires an action')
+  const action = actions.get(actionName)
+  if (!action) throw new Error('Action doesn\'t exists')
+  action.roles.add(roleName)
 }
 
 function revoke (actionName, role) {
@@ -115,8 +122,9 @@ module.exports = {
   removeRole,
   // related to action
   createAction,
-  // allow,
+  allow,
   revoke,
   setLevel,
+  // general
   can
 }

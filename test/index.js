@@ -57,7 +57,13 @@ test('createAction', t => {
 })
 
 test('allow', t => {
-  // TODO
+  t.throws(() => r.allow(), /allow method requires a role/, 'allow method requires a role')
+  t.throws(() => r.allow('other'), /allow method requires an action/, 'allow method requires an action')
+  t.throws(() => r.allow('other', 'noExists'), /Action doesn't exists/, 'Action doesn\'t exists')
+  r.createAction('forTestAllow')
+  t.notOk(r.can('another', 'forTestAllow'), 'pretest')
+  r.allow('other', 'forTestAllow')
+  t.ok(r.can('other', 'forTestAllow'), 'can')
   t.end()
 })
 
