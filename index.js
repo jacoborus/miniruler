@@ -1,6 +1,3 @@
-const actions = new Map()
-const contextRoles = new Map()
-
 // RELATED TO TYPE CHECKING
 // Check if an object is an array
 function isArray (obj) {
@@ -41,29 +38,30 @@ function checkRolesObj (roles) {
 
 // RELATED TO CONTEXT
 
-function setRoles (roles) {
+function setRoles (roles, context) {
   checkRolesObj(roles)
-  Object.keys(roles).forEach(roleName => {
-    contextRoles.set(roleName, roles[roleName])
+  Object.keys(roles).forEach(role => {
+    context.roles.set(role, roles[role])
   })
 }
 
-function addRole (roleName, level) {
+function addRole (role, level, context) {
   if (typeof level !== 'number') throw new Error('Level has to be a number')
-  if (!roleName) throw new Error('addRole requires a roleName')
-  contextRoles.set(roleName, level)
+  if (!role) throw new Error('addRole requires a role')
+  context.roles.set(role, level)
 }
 
-function removeRole (roleName) {
-  contextRoles.delete(roleName)
+function removeRole (role, context) {
+  context.roles.delete(role)
 }
 
 // RELATED TO ACTIONS
 
-function createAction (name, {roles = [], level = null} = {roles: [], level: null}) {
+function createAction (name, {roles = [], level = null} = {roles: [], level: null}, context) {
   checkActionName(name)
   checkLevelType(level)
   checkRolesType(roles)
+  const actions = context.actions
   if (actions.has(name)) throw new Error(`Action ${name} already exists`)
   const action = { roles: new Set(roles) }
   if (typeof level === 'undefined' || level === null) {
@@ -75,24 +73,24 @@ function createAction (name, {roles = [], level = null} = {roles: [], level: nul
   actions.set(name, action)
 }
 
-function allow (roleName, actionName) {
+function allow (roleName, actionName, context) {
   if (!roleName) throw new Error('allow method requires a role')
   if (!actionName) throw new Error('allow method requires an action')
-  const action = actions.get(actionName)
+  const action = context.actions.get(actionName)
   if (!action) throw new Error('Action doesn\'t exists')
   action.roles.add(roleName)
 }
 
-function revoke (actionName, role) {
-  const action = actions.get(actionName)
+function revoke (actionName, role, context) {
+  const action = context.actions.get(actionName)
   if (!action) throw new Error('Action doesn\'t exists')
   action.roles.delete(role)
 }
 
-function setLevel (actionName, level) {
+function setLevel (actionName, level, context) {
   checkLevelType(level)
   if (!actionName) throw new Error('setLevel requires a actionName')
-  const action = actions.get(actionName)
+  const action = context.actions.get(actionName)
   if (!action) throw new Error('action doesn\'t exists')
   if (typeof level === 'undefined' || level === null) {
     action.noLevel = true
@@ -105,26 +103,39 @@ function setLevel (actionName, level) {
 
 // GENERAL
 
-function can (roleName, actionName) {
-  const action = actions.get(actionName)
+function can (roleName, actionName, context) {
+  const action = context.actions.get(actionName)
   if (!action) throw new Error('Action doesn\'t exists')
   if (action.roles.has(roleName)) return true
   if (action.noLevel) return false
-  const role = contextRoles.get(roleName)
+  const role = context.roles.get(roleName)
   if (typeof role === 'undefined') return false
   return role <= action.level
 }
 
-module.exports = {
-  // related to context
-  setRoles,
-  addRole,
-  removeRole,
-  // related to action
-  createAction,
-  allow,
-  revoke,
-  setLevel,
-  // general
-  can
+function createContext (name, parentContext) {
+  if (!name) throw new Error('context require a name')
+  const context = {
+    actions: new Map(),
+    roles: new Map(),
+    contexts: new Map()
+  }
+  return {
+    // createContext,
+    setRoles: roles => setRoles(roles, context),
+    addRole: (roleName, level) => addRole(roleName, level, context),
+    removeRole: roleName => removeRole(roleName, context),
+    // related to action
+    createAction: (name, options) => createAction(name, options, context),
+    setLevel: (actionName, level) => setLevel(actionName, level, context),
+    allow: (roleName, actionName) => allow(roleName, actionName, context),
+    revoke: (actionName, role) => revoke(actionName, role, context),
+    // general
+    can: (roleName, actionName) => can(roleName, actionName, context),
+    createContext: name => createContext(name, context)
+  }
 }
+
+const mainContext = createContext('__')
+
+module.exports = mainContext
