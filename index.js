@@ -120,6 +120,7 @@ function createContext (name, parentContext) {
     roles: new Map(),
     contexts: new Map()
   }
+
   return {
     // createContext,
     setRoles: roles => setRoles(roles, context),
@@ -132,7 +133,12 @@ function createContext (name, parentContext) {
     revoke: (actionName, role) => revoke(actionName, role, context),
     // general
     can: (roleName, actionName) => can(roleName, actionName, context),
-    createContext: name => createContext(name, context)
+    createContext: name => {
+      const subContext = createContext(name, context)
+      context.contexts.set(name, subContext)
+      return subContext
+    },
+    getContext: name => context.contexts.get(name)
   }
 }
 
