@@ -49,7 +49,7 @@ ruler.can('author', 'create post') // true
 ruler.can('guest', 'create post') // false
 
 ruler.revoke('author', 'create post')
-ruler.can('author', create post') // false
+ruler.can('author', 'create post') // false
 ```
 ## Context API
 
