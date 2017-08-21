@@ -1,10 +1,6 @@
 miniruler
 =========
 
-[![browser support](https://ci.testling.com/jacoborus/miniruler.png)
-](https://ci.testling.com/jacoborus/miniruler)
-
-
 [![Build Status](https://travis-ci.org/jacoborus/miniruler.svg?branch=master)](https://travis-ci.org/jacoborus/miniruler)
 
 Manage roles in contexts asynchronously.
@@ -23,34 +19,37 @@ Example
 ```js
 const ruler = require('miniruler')
 
-/* - action roles - */
+/* - action with level - */
 
-ruler.createAction('manageSettings', {
-  roles: ['admin', 'user']
+ruler.setRoles({
+  admin: 1,
+  editor: 2,
+  author: 3,
+  guest: 4
 })
 
-ruler.can( 'admin', 'manageSettings' )  // => true
-ruler.can( 'author', 'manageSettings' )  // => false
+ruler.createAction('manage settings', {
+  level: 1
+})
+
+ruler.can('admin', 'manage settings')  // => true
+ruler.can('editor', 'manage settings')  // => false
+ruler.can('author', 'manage settings')  // => false
 
 
-/* - action levels - */
+/* - action with extra roles - */
 
-ruler.createAction(
-  'manageSettings',
-  { level: 0 }
-)
+ruler.createAction('create post', {
+  level: 2,
+  roles: ['author']
+})
 
-ruler.can(0, 'manageSettings') // true
-ruler.can(2, 'manageSettings') // false
+ruler.can('editor', 'create post') // true
+ruler.can('author', 'create post') // true
+ruler.can('guest', 'create post') // false
 
-
-/* - revoke - */
-
-ruler.revoke('manageSettings', 'user')
-
-ruler.can('user', 'manageSettings')  // => false
-ruler.can('admin', 'manageSettings') // => admin
-
+ruler.revoke('author', 'create post')
+ruler.can('author', create post') // false
 ```
 ## Context API
 
@@ -62,6 +61,7 @@ ruler.can('admin', 'manageSettings') // => admin
 - [allow](#allow)
 - [revoke](#revoke)
 - [can](#can)
+- [createContext](#createContext)
 - [getContext](#getContext)
 
 
