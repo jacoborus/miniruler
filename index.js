@@ -41,7 +41,6 @@ function createContext (name, parentContext) {
   const actions = new Map()
   const roles = new Map()
   const contexts = new Map()
-  const context = { actions, roles, contexts }
 
   return {
     /**
@@ -89,7 +88,6 @@ function createContext (name, parentContext) {
       checkActionName(name)
       checkLevelType(level)
       checkRolesType(roles)
-      const actions = context.actions
       if (actions.has(name)) throw new Error(`Action ${name} already exists`)
       const action = { roles: new Set(roles) }
       if (typeof level === 'undefined' || level === null) {
@@ -155,7 +153,7 @@ function createContext (name, parentContext) {
      * @returns {boolean}
      */
     can (roleName, actionName) {
-      const action = context.actions.get(actionName)
+      const action = actions.get(actionName)
       if (!action) throw new Error('Action doesn\'t exists')
       if (action.roles.has(roleName)) return true
       if (action.noLevel) return false
@@ -170,7 +168,7 @@ function createContext (name, parentContext) {
      * @param {string} name
      */
     createContext (name) {
-      const subContext = createContext(name, context)
+      const subContext = createContext(name)
       contexts.set(name, subContext)
       return subContext
     },
