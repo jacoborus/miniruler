@@ -36,112 +36,153 @@ function checkRolesObj (roles) {
   }
 }
 
-// RELATED TO CONTEXT
-
-function setRoles (roles, context) {
-  checkRolesObj(roles)
-  Object.keys(roles).forEach(role => {
-    context.roles.set(role, roles[role])
-  })
-}
-
-function addRole (role, level, context) {
-  if (typeof level !== 'number') throw new Error('Level has to be a number')
-  if (!role) throw new Error('addRole requires a role')
-  context.roles.set(role, level)
-}
-
-function removeRole (role, context) {
-  context.roles.delete(role)
-}
-
-// RELATED TO ACTIONS
-
-function createAction (name, {roles = [], level = null} = {roles: [], level: null}, context) {
-  checkActionName(name)
-  checkLevelType(level)
-  checkRolesType(roles)
-  const actions = context.actions
-  if (actions.has(name)) throw new Error(`Action ${name} already exists`)
-  const action = { roles: new Set(roles) }
-  if (typeof level === 'undefined' || level === null) {
-    action.noLevel = true
-  } else {
-    action.level = level
-    action.noLevel = false
-  }
-  actions.set(name, action)
-}
-
-function allow (roleName, actionName, context) {
-  if (!roleName) throw new Error('allow method requires a role')
-  if (!actionName) throw new Error('allow method requires an action')
-  const action = context.actions.get(actionName)
-  if (!action) throw new Error('Action doesn\'t exists')
-  action.roles.add(roleName)
-}
-
-function revoke (actionName, role, context) {
-  const action = context.actions.get(actionName)
-  if (!action) throw new Error('Action doesn\'t exists')
-  action.roles.delete(role)
-}
-
-function setLevel (actionName, level, context) {
-  checkLevelType(level)
-  if (!actionName) throw new Error('setLevel requires a actionName')
-  const action = context.actions.get(actionName)
-  if (!action) throw new Error('action doesn\'t exists')
-  if (typeof level === 'undefined' || level === null) {
-    action.noLevel = true
-    delete action.level
-  } else {
-    action.level = level
-    action.noLevel = false
-  }
-}
-
-// GENERAL
-
-function can (roleName, actionName, context) {
-  const action = context.actions.get(actionName)
-  if (!action) throw new Error('Action doesn\'t exists')
-  if (action.roles.has(roleName)) return true
-  if (action.noLevel) return false
-  const role = context.roles.get(roleName)
-  if (typeof role === 'undefined') return false
-  return role <= action.level
-}
-
 function createContext (name, parentContext) {
   if (!name) throw new Error('context require a name')
-  const context = {
-    actions: new Map(),
-    roles: new Map(),
-    contexts: new Map()
-  }
+  const actions = new Map()
+  const roles = new Map()
+  const contexts = new Map()
+  const context = { actions, roles, contexts }
 
   return {
-    // createContext,
-    setRoles: roles => setRoles(roles, context),
-    addRole: (roleName, level) => addRole(roleName, level, context),
-    removeRole: roleName => removeRole(roleName, context),
-    // related to action
-    createAction: (name, options) => createAction(name, options, context),
-    setLevel: (actionName, level) => setLevel(actionName, level, context),
-    allow: (roleName, actionName) => allow(roleName, actionName, context),
-    revoke: (actionName, role) => revoke(actionName, role, context),
-    // general
-    can: (roleName, actionName) => can(roleName, actionName, context),
-    createContext: name => {
+    /**
+     * setRoles
+     *
+     * @param {object} roles list of roles (keynames) and their levels (values)
+     * @param {object} context where the roles belong to
+    */
+    setRoles (roleObj) {
+      checkRolesObj(roleObj)
+      Object.keys(roleObj).forEach(role => {
+        roles.set(role, roleObj[role])
+      })
+    },
+
+    /**
+     * addRole
+     *
+     * @param {string} roleName
+     * @param {number} level
+     */
+    addRole (roleName, level) {
+      if (typeof level !== 'number') throw new Error('Level has to be a number')
+      if (!roleName) throw new Error('addRole requires a role')
+      roles.set(roleName, level)
+    },
+
+    /**
+     * removeRole
+     *
+     * @param {string} roleName
+     */
+    removeRole (roleName) {
+      roles.delete(roleName)
+    },
+
+    /**
+     * createAction
+     *
+     * @param {string} name
+     * @param {array} roles
+     * @param {number} level
+     */
+    createAction (name, {roles = [], level = null} = {roles: [], level: null}) {
+      checkActionName(name)
+      checkLevelType(level)
+      checkRolesType(roles)
+      const actions = context.actions
+      if (actions.has(name)) throw new Error(`Action ${name} already exists`)
+      const action = { roles: new Set(roles) }
+      if (typeof level === 'undefined' || level === null) {
+        action.noLevel = true
+      } else {
+        action.level = level
+        action.noLevel = false
+      }
+      actions.set(name, action)
+    },
+
+    /**
+     * setLevel
+     *
+     * @param {string} actionName
+     * @param {number} level
+     */
+    setLevel (actionName, level) {
+      checkLevelType(level)
+      if (!actionName) throw new Error('setLevel requires a actionName')
+      const action = actions.get(actionName)
+      if (!action) throw new Error('action doesn\'t exists')
+      if (typeof level === 'undefined' || level === null) {
+        action.noLevel = true
+        delete action.level
+      } else {
+        action.level = level
+        action.noLevel = false
+      }
+    },
+
+    /**
+     * allow
+     *
+     * @param {string} roleName
+     * @param {string} actionName
+     */
+    allow (roleName, actionName) {
+      if (!roleName) throw new Error('allow method requires a role')
+      if (!actionName) throw new Error('allow method requires an action')
+      const action = actions.get(actionName)
+      if (!action) throw new Error('Action doesn\'t exists')
+      action.roles.add(roleName)
+    },
+
+    /**
+     * revoke
+     *
+     * @param {string} actionName
+     * @param {string} role
+     */
+    revoke (actionName, role) {
+      const action = actions.get(actionName)
+      if (!action) throw new Error('Action doesn\'t exists')
+      action.roles.delete(role)
+    },
+
+    /**
+     * can
+     *
+     * @param {string} roleName
+     * @param {string} actionName
+     * @returns {boolean}
+     */
+    can (roleName, actionName) {
+      const action = context.actions.get(actionName)
+      if (!action) throw new Error('Action doesn\'t exists')
+      if (action.roles.has(roleName)) return true
+      if (action.noLevel) return false
+      const role = roles.get(roleName)
+      if (typeof role === 'undefined') return false
+      return role <= action.level
+    },
+
+    /**
+     * createContext
+     *
+     * @param {string} name
+     */
+    createContext (name) {
       const subContext = createContext(name, context)
-      context.contexts.set(name, subContext)
+      contexts.set(name, subContext)
       return subContext
     },
-    getContext: name => context.contexts.get(name)
+
+    /**
+     * getContext
+     *
+     * @param {string} name
+     * @returns {object} context
+     */
+    getContext: name => contexts.get(name)
   }
 }
 
-const mainContext = createContext('__')
-
-module.exports = mainContext
+module.exports = createContext('__')
