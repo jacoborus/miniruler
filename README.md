@@ -41,7 +41,7 @@ ruler.can('author', 'manage settings')  // => false
 
 ruler.createAction('create post', {
   level: 2,
-  roles: ['author']
+  include: ['author']
 })
 
 ruler.can('editor', 'create post') // true
@@ -129,14 +129,14 @@ Create an action inside a context and assign rules
 - **actionName** *String*
 - **rules** *Object*: (optional) can contain `level` and allowed `roles`
   - **level** *Number*: minimum level of the roles allowed to perform the action
-  - **roles** *Array*: list of role names (strings) allowed to perform the action
+  - **include** *Array*: list of role names (strings) allowed to perform the action (even if their levels are not enough)
 
 Example:
 
 ```js
 context.createAction('create page', {
   level: 3,
-  roles: ['other']
+  include: ['other']
 })
 ```
 

@@ -28,22 +28,22 @@ module.exports = function (r) {
     t.throws(() => { r.createAction(1) }, 'action name should be a string')
     t.throws(() => { r.createAction('') }, 'action name cannot be a empty string')
     // action roles
-    t.throws(() => { r.createAction('e', {roles: 1}) }, 'action roles should be an array (num)')
-    t.throws(() => { r.createAction('e', {roles: {}}) }, 'action roles should be an array (obj)')
-    t.throws(() => { r.createAction('e', {roles: ''}) }, 'action roles should be an array (str)')
+    t.throws(() => { r.createAction('e', {include: 1}) }, 'action roles should be an array (num)')
+    t.throws(() => { r.createAction('e', {include: {}}) }, 'action roles should be an array (obj)')
+    t.throws(() => { r.createAction('e', {include: ''}) }, 'action roles should be an array (str)')
     t.throws(
-      () => { r.createAction('e', {roles: [1]}) },
+      () => { r.createAction('e', {include: [1]}) },
       'action roles should be an array of strings (arr with wrong types inside, numbers)'
     )
     t.throws(
-      () => { r.createAction('e', {roles: [{}]}) },
+      () => { r.createAction('e', {include: [{}]}) },
       'action roles should be an array of strings (arr with wrong types inside, object)'
     )
     t.doesNotThrow(
-      () => { r.createAction('rr1', {roles: []}) }, 'action roles should be an array (arr)'
+      () => { r.createAction('rr1', {include: []}) }, 'action roles should be an array (arr)'
     )
     t.doesNotThrow(
-      () => { r.createAction('rr2', {roles: ['role1', 'role2']}) },
+      () => { r.createAction('rr2', {include: ['role1', 'role2']}) },
       'action roles should be an array of strings'
     )
     // action levels
@@ -68,9 +68,9 @@ module.exports = function (r) {
   })
 
   test('revoke', t => {
-    r.createAction('forRevoke', {roles: ['uno']})
+    r.createAction('forRevoke', {include: ['uno']})
     t.ok(r.can('uno', 'forRevoke'), 'pretest revoke role permission')
-    r.revoke('forRevoke', 'uno')
+    r.revoke('uno', 'forRevoke')
     t.notOk(r.can('uno', 'forRevoke'), 'revoke role permission')
     t.end()
   })
@@ -100,7 +100,7 @@ module.exports = function (r) {
     t.throws(() => r.can('asdfasdf', 'asdf'), 'check the action to exists')
     t.throws(() => r.can('asdfasdf', []), 'check the action type')
     // with roles
-    r.createAction('testRoles', {roles: ['admin', 'other']})
+    r.createAction('testRoles', {include: ['admin', 'other']})
     t.ok(r.can('admin', 'testRoles'), 'can: check roles')
     t.ok(r.can('other', 'testRoles'), 'can: check roles')
     t.notOk(r.can('another', 'testRoles'), 'can: check roles')

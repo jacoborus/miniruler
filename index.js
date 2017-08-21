@@ -80,23 +80,23 @@ function createContext (name, parentContext) {
     /**
      * createAction
      *
-     * @param {string} name
-     * @param {array} roles
+     * @param {string} actionName
+     * @param {array} include
      * @param {number} level
      */
-    createAction (name, {roles = [], level = null} = {roles: [], level: null}) {
-      checkActionName(name)
+    createAction (actionName, {include = [], level = null} = {include: [], level: null}) {
+      checkActionName(actionName)
       checkLevelType(level)
-      checkRolesType(roles)
-      if (actions.has(name)) throw new Error(`Action ${name} already exists`)
-      const action = { roles: new Set(roles) }
+      checkRolesType(include)
+      if (actions.has(actionName)) throw new Error(`Action ${actionName} already exists`)
+      const action = { roles: new Set(include) }
       if (typeof level === 'undefined' || level === null) {
         action.noLevel = true
       } else {
         action.level = level
         action.noLevel = false
       }
-      actions.set(name, action)
+      actions.set(actionName, action)
     },
 
     /**
@@ -139,10 +139,10 @@ function createContext (name, parentContext) {
      * @param {string} actionName
      * @param {string} role
      */
-    revoke (actionName, role) {
+    revoke (roleName, actionName) {
       const action = actions.get(actionName)
       if (!action) throw new Error('Action doesn\'t exists')
-      action.roles.delete(role)
+      action.roles.delete(roleName)
     },
 
     /**
@@ -165,11 +165,11 @@ function createContext (name, parentContext) {
     /**
      * createContext
      *
-     * @param {string} name
+     * @param {string} contextName
      */
-    createContext (name) {
-      const subContext = createContext(name)
-      contexts.set(name, subContext)
+    createContext (contextName) {
+      const subContext = createContext(contextName)
+      contexts.set(contextName, subContext)
       return subContext
     },
 
